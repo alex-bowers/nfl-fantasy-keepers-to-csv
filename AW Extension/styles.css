@@ -1,0 +1,18 @@
+.popup__body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    width: 200px;
+}
+.popup__body__header {
+    font-size: 1.25rem;
+    margin: 0 0 1rem 0;
+}
+.popup__body__action {
+    background-color: #d83547;
+    color: white;
+    padding: 1rem;
+    font-weight: 600;
+}

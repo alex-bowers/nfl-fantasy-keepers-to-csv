@@ -1,6 +1,3 @@
-const webPageTable = document.getElementsByClassName('tableWrap')[0].getElementsByTagName('tbody')[0]
-const webPageTableRows = webPageTable.children
-
 let positionSizes = { QB: 0, RB: 0, WR: 0, TE: 0, K: 0, DEF: 0 }
 let rosters = {}
 let csv = ""
@@ -66,35 +63,47 @@ function getMaxPositionLimits(rosters) {
     }
 }
 
-for (let i = 0; i < webPageTableRows.length; i++) {
-    const row = webPageTableRows[i].children
-    const teamNameRow = row[0].getElementsByClassName('teamImageAndName')[0]
-    let teamName = ""
+function createKeepersCSV() {
+    const webPageTable = document.getElementsByClassName('tableWrap')[0].getElementsByTagName('tbody')[0]
+    const webPageTableRows = webPageTable.children
 
-    if (typeof teamNameRow !== 'undefined') {
-        teamName = teamNameRow.getElementsByClassName('teamName')[0].text
-        const teamKeepers = row[1].innerText
-        if (teamName && teamKeepers) {
-            rosters[teamName] = formatRosters(teamKeepers.split('\n'))
+    for (let i = 0; i < webPageTableRows.length; i++) {
+        const row = webPageTableRows[i].children
+        const teamNameRow = row[0].getElementsByClassName('teamImageAndName')[0]
+        let teamName = ""
+
+        if (typeof teamNameRow !== 'undefined') {
+            teamName = teamNameRow.getElementsByClassName('teamName')[0].text
+            const teamKeepers = row[1].innerText
+            if (teamName && teamKeepers) {
+                rosters[teamName] = formatRosters(teamKeepers.split('\n'))
+            }
         }
     }
+
+    // Fill the rosters up until we hit the position limits.
+    getMaxPositionLimits(rosters)
+    fillRostersToLimits()
+
+    // Create the csv headers.
+    csv += `,${Object.keys(rosters).join(',')}\n`
+
+    // Add the roster data to the csv.
+    for (const position in positionSizes) {
+        addPositionToCSV(position)
+    }
+
+    // Download the csv.
+    const hiddenElement = document.createElement('a')
+    hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
+    hiddenElement.target = '_blank'
+    hiddenElement.download = 'rosters.csv'
+    hiddenElement.click()
 }
 
-// Fill the rosters up until we hit the position limits.
-getMaxPositionLimits(rosters)
-fillRostersToLimits()
-
-// Create the csv headers.
-csv += `,${Object.keys(rosters).join(',')}\n`
-
-// Add the roster data to the csv.
-for (const position in positionSizes) {
-    addPositionToCSV(position)
-}
-
-// Download the csv.
-const hiddenElement = document.createElement('a')
-hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv)
-hiddenElement.target = '_blank'
-hiddenElement.download = 'rosters.csv'
-hiddenElement.click()
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.data === 'create-keepers-csv') {
+        createKeepersCSV()
+        sendResponse({ success: true })
+    }
+})

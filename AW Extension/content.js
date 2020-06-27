@@ -39,9 +39,11 @@ function formatRosters(team) {
         const player = team[i].split(', ')
         if (player.length === 2) {
             const playerName = player[0].replace(/\d+.\s/g, '')
-            const playerPosition = player[1].split('-')[0]
+            const playerData = player[1].split('-')
+            const playerPosition = playerData[0]
+            const playerTeam = playerData[1]
 
-            playersByPositions[playerPosition].push(playerName)
+            playersByPositions[playerPosition].push(`${playerName}-${playerTeam}`)
         }
     }
 

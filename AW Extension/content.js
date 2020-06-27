@@ -43,7 +43,7 @@ function formatRosters(team) {
             const playerPosition = playerData[0]
             const playerTeam = playerData[1]
 
-            playersByPositions[playerPosition].push(`${playerName}-${playerTeam}`)
+            playersByPositions[playerPosition].push(`${playerName} - ${playerTeam}`)
         }
     }
 
